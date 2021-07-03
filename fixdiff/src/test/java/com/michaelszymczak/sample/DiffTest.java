@@ -35,4 +35,12 @@ public class DiffTest
                 new Result(2, of("", ""), of("foo", "bar"))
         );
     }
+
+    @Test
+    void shouldInsertMissingItem()
+    {
+        assertThat(new Diff(of("a", "b", "c"), of("b", "c")).result()).isEqualTo(
+                new Result(1, of("a", "b", "c"), of("", "b", "c"))
+        );
+    }
 }

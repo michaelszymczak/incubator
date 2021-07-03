@@ -5,19 +5,23 @@ import java.util.List;
 class Result
 {
     final int differences;
-    private final List<String> a;
-    private final List<String> b;
-
-    public Result(final int differences)
-    {
-        this(differences, List.of(), List.of());
-    }
+    final List<String> a;
+    final List<String> b;
 
     public Result(final int differences, final List<String> a, final List<String> b)
     {
         this.differences = differences;
         this.a = a;
         this.b = b;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = differences;
+        result = 31 * result + (a != null ? a.hashCode() : 0);
+        result = 31 * result + (b != null ? b.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -43,15 +47,6 @@ class Result
             return false;
         }
         return b != null ? b.equals(result.b) : result.b == null;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result = differences;
-        result = 31 * result + (a != null ? a.hashCode() : 0);
-        result = 31 * result + (b != null ? b.hashCode() : 0);
-        return result;
     }
 
     @Override

@@ -34,6 +34,9 @@ class Diff
 
             return new Result(expectedLength, aResult, bResult);
         }
-        throw new UnsupportedOperationException();
+
+        final List<String> newB = new ArrayList<>(List.of(""));
+        newB.addAll(b);
+        return new Result(1, a, newB);
     }
 }
