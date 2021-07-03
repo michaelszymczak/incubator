@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+import static java.util.List.copyOf;
+import static java.util.List.of;
+
 public class DiffTest
 {
     @Test
@@ -18,19 +22,29 @@ public class DiffTest
     @Test
     void emptySequencesShouldBeTheSame()
     {
-        assertThat(new Diff(List.of(), List.of()).result()).isEqualTo(new Result(0));
+        assertThat(new Diff(of(), of()).result()).isEqualTo(new Result(0));
+    }
+
+    @Test
+    void shouldUseTheLengthAsTheDifferenceBetweenEmptyAndNonEmptySequence()
+    {
+        assertThat(new Diff(of("foo", "bar", "c"), of()).result()).isEqualTo(new Result(3));
     }
 
     private static class Diff
     {
+        private final List<String> a;
+        private final List<String> b;
+
         public Diff(final List<String> a, final List<String> b)
         {
-
+            this.a = copyOf(a);
+            this.b = copyOf(b);
         }
 
         public Result result()
         {
-            return new Result(0);
+            return new Result(a.size() - b.size());
         }
     }
 
@@ -44,11 +58,9 @@ public class DiffTest
         }
 
         @Override
-        public String toString()
+        public int hashCode()
         {
-            return "Result{" +
-                   "differences=" + differences +
-                   '}';
+            return differences;
         }
 
         @Override
@@ -69,9 +81,11 @@ public class DiffTest
         }
 
         @Override
-        public int hashCode()
+        public String toString()
         {
-            return differences;
+            return "Result{" +
+                   "differences=" + differences +
+                   '}';
         }
     }
 
