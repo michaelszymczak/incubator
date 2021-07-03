@@ -20,12 +20,20 @@ class Diff
 
     public Result result()
     {
-        final int expectedLength = Math.abs(a.size() - b.size());
-        final List<String> aResult = new ArrayList<>(a);
-        final List<String> bResult = new ArrayList<>(b);
-        range(aResult.size(), expectedLength).forEach(__ -> aResult.add(""));
-        range(bResult.size(), expectedLength).forEach(__ -> bResult.add(""));
+        if (a.equals(b))
+        {
+            return new Result(0, a, b);
+        }
+        if (a.isEmpty() || b.isEmpty())
+        {
+            final int expectedLength = Math.abs(a.size() - b.size());
+            final List<String> aResult = new ArrayList<>(a);
+            final List<String> bResult = new ArrayList<>(b);
+            range(aResult.size(), expectedLength).forEach(__ -> aResult.add(""));
+            range(bResult.size(), expectedLength).forEach(__ -> bResult.add(""));
 
-        return new Result(expectedLength, aResult, bResult);
+            return new Result(expectedLength, aResult, bResult);
+        }
+        throw new UnsupportedOperationException();
     }
 }

@@ -18,6 +18,14 @@ public class DiffTest
     }
 
     @Test
+    void shouldDetectTheSameSequences()
+    {
+        assertThat(new Diff(of("foo", "bar", "c"), of("foo", "bar", "c")).result()).isEqualTo(
+                new Result(0, of("foo", "bar", "c"), of("foo", "bar", "c"))
+        );
+    }
+
+    @Test
     void shouldUseTheLengthAsTheDifferenceBetweenEmptyAndNonEmptySequence()
     {
         assertThat(new Diff(of("foo", "bar", "c"), of()).result()).isEqualTo(
