@@ -1,5 +1,7 @@
 package com.michaelszymczak.sample;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,13 +14,17 @@ public class DiffTest
     @Test
     void emptySequencesShouldBeTheSame()
     {
-        assertThat(new Diff(of(), of()).result()).isEqualTo(new Result(0));
+        assertThat(new Diff(of(), of()).result()).isEqualTo(new Result(0, List.of(), List.of()));
     }
 
     @Test
     void shouldUseTheLengthAsTheDifferenceBetweenEmptyAndNonEmptySequence()
     {
-        assertThat(new Diff(of("foo", "bar", "c"), of()).result()).isEqualTo(new Result(3));
-        assertThat(new Diff(of(), of("foo", "bar")).result()).isEqualTo(new Result(2));
+        assertThat(new Diff(of("foo", "bar", "c"), of()).result()).isEqualTo(
+                new Result(3, of("foo", "bar", "c"), of("", "", ""))
+        );
+        assertThat(new Diff(of(), of("foo", "bar")).result()).isEqualTo(
+                new Result(2, of("", ""), of("foo", "bar"))
+        );
     }
 }
