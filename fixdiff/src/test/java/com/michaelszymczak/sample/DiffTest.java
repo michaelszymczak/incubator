@@ -37,10 +37,18 @@ public class DiffTest
     }
 
     @Test
-    void shouldInsertMissingItem()
+    void shouldInsertItemMissingFromTheSecondSequence()
     {
         assertThat(new Diff(of("a", "b", "c"), of("b", "c")).result()).isEqualTo(
                 new Result(1, of("a", "b", "c"), of("", "b", "c"))
+        );
+    }
+
+    @Test
+    void shouldInsertItemMissingFromTheFirstSequence()
+    {
+        assertThat(new Diff(of("b", "c"), of("a", "b", "c")).result()).isEqualTo(
+                new Result(1, of("", "b", "c"), of("a", "b", "c"))
         );
     }
 }

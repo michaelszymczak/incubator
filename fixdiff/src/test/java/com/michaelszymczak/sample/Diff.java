@@ -35,8 +35,20 @@ class Diff
             return new Result(expectedLength, aResult, bResult);
         }
 
-        final List<String> newB = new ArrayList<>(List.of(""));
-        newB.addAll(b);
-        return new Result(1, a, newB);
+        final Result result1 = new Diff(a.subList(1, a.size()), b).result();
+        final Result result2 = new Diff(a, b.subList(1, b.size())).result();
+        if (result1.differences < result2.differences)
+        {
+            final List<String> newB = new ArrayList<>(List.of(""));
+            newB.addAll(b);
+            return new Result(1, a, newB);
+        }
+        else
+        {
+            final List<String> newA = new ArrayList<>(List.of(""));
+            newA.addAll(a);
+            return new Result(1, newA, b);
+        }
+
     }
 }
