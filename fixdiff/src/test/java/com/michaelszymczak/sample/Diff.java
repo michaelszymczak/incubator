@@ -46,9 +46,8 @@ class Diff
         else
         {
             final List<String> newA = new ArrayList<>(List.of(""));
-            newA.addAll(a);
-            return new Result(1, newA, b);
+            newA.addAll(result2.a);
+            return new Result(result2.differences + 1, newA, b);
         }
-
     }
 }
