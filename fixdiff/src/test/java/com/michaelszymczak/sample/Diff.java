@@ -40,8 +40,8 @@ class Diff
         if (result1.differences < result2.differences)
         {
             final List<String> newB = new ArrayList<>(List.of(""));
-            newB.addAll(b);
-            return new Result(1, a, newB);
+            newB.addAll(result1.b);
+            return new Result(result1.differences + 1, a, newB);
         }
         else
         {

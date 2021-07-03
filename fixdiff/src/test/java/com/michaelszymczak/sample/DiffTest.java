@@ -59,4 +59,12 @@ public class DiffTest
                 new Result(2, of("", "", "c"), of("a", "b", "c"))
         );
     }
+
+    @Test
+    void shouldInsertMultipleItemsMissingFromTheSecondSequence()
+    {
+        assertThat(new Diff(of("a", "b", "c"), of("c")).result()).isEqualTo(
+                new Result(2, of("a", "b", "c"), of("", "", "c"))
+        );
+    }
 }
