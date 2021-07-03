@@ -1,29 +1,22 @@
 plugins {
-	id 'java'
-	id 'application'
-	id 'idea'
+    id 'java'
+    id 'idea'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 compileJava {
-	sourceCompatibility = '11'
-	targetCompatibility = '11'
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 }
 
 test {
-	useJUnitPlatform()
-	testLogging {
-		events "passed", "skipped", "failed"
-	}
-}
-
-application {
-	mainClass = 'com.michaelszymczak.sample.FooMain'
+    useJUnitPlatform()
 }
 
 dependencies {
-	testImplementation('org.junit.jupiter:junit-jupiter:5.7.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'org.assertj:assertj-core:3.20.2'
 }
