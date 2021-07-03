@@ -1,0 +1,29 @@
+plugins {
+	id 'java'
+	id 'application'
+	id 'idea'
+}
+
+repositories {
+	mavenCentral()
+}
+
+compileJava {
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+
+application {
+	mainClass = 'com.michaelszymczak.sample.FooMain'
+}
+
+dependencies {
+	testImplementation('org.junit.jupiter:junit-jupiter:5.7.2')
+}
