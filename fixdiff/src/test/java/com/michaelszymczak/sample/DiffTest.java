@@ -29,6 +29,7 @@ public class DiffTest
     void shouldUseTheLengthAsTheDifferenceBetweenEmptyAndNonEmptySequence()
     {
         assertThat(new Diff(of("foo", "bar", "c"), of()).result()).isEqualTo(new Result(3));
+        assertThat(new Diff(of(), of("foo", "bar")).result()).isEqualTo(new Result(2));
     }
 
     private static class Diff
@@ -44,7 +45,7 @@ public class DiffTest
 
         public Result result()
         {
-            return new Result(a.size() - b.size());
+            return new Result(Math.abs(a.size() - b.size()));
         }
     }
 
