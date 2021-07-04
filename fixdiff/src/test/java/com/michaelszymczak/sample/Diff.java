@@ -1,9 +1,11 @@
 package com.michaelszymczak.sample;
 
 import java.util.List;
+import java.util.function.BiPredicate;
 
 
 import static com.michaelszymczak.sample.Lists.appended;
+import static com.michaelszymczak.sample.Lists.equal;
 import static com.michaelszymczak.sample.Lists.prepended;
 import static java.util.List.copyOf;
 
@@ -12,6 +14,7 @@ public final class Diff<Value>
     private final Value emptyValue;
     private final List<Value> a;
     private final List<Value> b;
+    private final BiPredicate<Value, Value> isEqual = Object::equals;
 
     private Diff(final Value emptyValue, final List<Value> a, final List<Value> b)
     {
@@ -36,7 +39,7 @@ public final class Diff<Value>
 
     public Result<Value> result()
     {
-        if (a.equals(b))
+        if (equal(isEqual, a, b))
         {
             return new Result<>(0, a, b);
         }
