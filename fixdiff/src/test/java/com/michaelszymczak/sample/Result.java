@@ -4,9 +4,9 @@ import java.util.List;
 
 class Result
 {
-    final int differences;
     final List<String> a;
     final List<String> b;
+    private final int differences;
 
     public Result(final int differences, final List<String> a, final List<String> b)
     {
@@ -18,7 +18,7 @@ class Result
     @Override
     public int hashCode()
     {
-        int result = differences;
+        int result = differences();
         result = 31 * result + (a != null ? a.hashCode() : 0);
         result = 31 * result + (b != null ? b.hashCode() : 0);
         return result;
@@ -38,7 +38,7 @@ class Result
 
         final Result result = (Result)o;
 
-        if (differences != result.differences)
+        if (differences() != result.differences())
         {
             return false;
         }
@@ -53,9 +53,14 @@ class Result
     public String toString()
     {
         return "Result{" +
-               "differences=" + differences +
+               "differences=" + differences() +
                ", a=" + a +
                ", b=" + b +
                '}';
+    }
+
+    public int differences()
+    {
+        return differences;
     }
 }
