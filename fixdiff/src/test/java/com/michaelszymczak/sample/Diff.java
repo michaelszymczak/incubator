@@ -7,13 +7,13 @@ import static com.michaelszymczak.sample.Lists.appended;
 import static com.michaelszymczak.sample.Lists.prepended;
 import static java.util.List.copyOf;
 
-class Diff<Value>
+public final class Diff<Value>
 {
     private final Value emptyValue;
     private final List<Value> a;
     private final List<Value> b;
 
-    public Diff(final Value emptyValue, final List<Value> a, final List<Value> b)
+    private Diff(final Value emptyValue, final List<Value> a, final List<Value> b)
     {
         if (a.stream().anyMatch(value -> value.equals(emptyValue)) || b.stream().anyMatch(value -> value.equals(emptyValue)))
         {
@@ -26,9 +26,13 @@ class Diff<Value>
 
     public static Diff<String> diff(final List<String> a, final List<String> b)
     {
-        return new Diff<>("_", a, b);
+        return diff("_", a, b);
     }
 
+    public static <Value> Diff<Value> diff(final Value emptyValue, final List<Value> a, final List<Value> b)
+    {
+        return new Diff<>(emptyValue, a, b);
+    }
 
     public Result<Value> result()
     {
@@ -42,11 +46,11 @@ class Diff<Value>
             return new Result<>(expectedLength, appended(a, emptyValue, expectedLength), appended(b, emptyValue, expectedLength));
         }
 
-        final Result<Value> result1 = new Diff<>(emptyValue, a.subList(1, a.size()), b).result();
-        final Result<Value> result2 = new Diff<>(emptyValue, a, b.subList(1, b.size())).result();
+        final Result<Value> result1 = diff(emptyValue, a.subList(1, a.size()), b).result();
+        final Result<Value> result2 = diff(emptyValue, a, b.subList(1, b.size())).result();
         if (a.get(0).equals(b.get(0)))
         {
-            final Result<Value> result3 = new Diff<>(emptyValue, a.subList(1, a.size()), b.subList(1, b.size())).result();
+            final Result<Value> result3 = diff(emptyValue, a.subList(1, a.size()), b.subList(1, b.size())).result();
             if (result3.differences() < result1.differences() + 1 && result3.differences() < result2.differences())
             {
                 return new Result<>(result3.differences(), prepended(a.get(0), result3.a), prepended(b.get(0), result3.b));

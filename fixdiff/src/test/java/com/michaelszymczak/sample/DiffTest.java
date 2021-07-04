@@ -131,14 +131,14 @@ public class DiffTest
     @Test
     void shouldMakeEmptyValueCustomizable()
     {
-        assertThat(new Diff<>("[EMPTY]", List.of("a"), List.of()).result()).isEqualTo(
+        assertThat(Diff.diff("[EMPTY]", List.of("a"), List.of()).result()).isEqualTo(
                 new Result<>(1, List.of("a"), List.of("[EMPTY]")));
     }
 
     @Test
     void shouldAllowAnyValueType()
     {
-        assertThat(new Diff<>(0, of(1, 2, 3, 4), of(2, 3, 6)).result()).isEqualTo(
+        assertThat(Diff.diff(0, of(1, 2, 3, 4), of(2, 3, 6)).result()).isEqualTo(
                 new Result<>(
                         3,
                         of(1, 2, 3, 0, 4),
@@ -150,8 +150,8 @@ public class DiffTest
     @Test
     void shouldNotAllowEmptyValueInTheSequence()
     {
-        assertThatThrownBy(() -> new Diff<>("x", List.of("a", "x"), List.of())).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new Diff<>("x", List.of("a"), List.of("a", "x", "b"))).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new Diff<>(5, List.of(5), List.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Diff.diff("x", List.of("a", "x"), List.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Diff.diff("x", List.of("a"), List.of("a", "x", "b"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Diff.diff(5, List.of(5), List.of())).isInstanceOf(IllegalArgumentException.class);
     }
 }
