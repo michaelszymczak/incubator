@@ -126,4 +126,11 @@ public class DiffTest
                 )
         );
     }
+
+    @Test
+    void shouldMakeEmptyValueCustomizable()
+    {
+        assertThat(new Diff("[EMPTY]", List.of("a"), List.of()).result()).isEqualTo(
+                new Result(1, List.of("a"), List.of("[EMPTY]")));
+    }
 }

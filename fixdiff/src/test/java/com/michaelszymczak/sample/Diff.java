@@ -9,14 +9,22 @@ import static java.util.List.copyOf;
 
 class Diff
 {
+    private final String emptyValue;
     private final List<String> a;
     private final List<String> b;
 
     public Diff(final List<String> a, final List<String> b)
     {
+        this("_", a, b);
+    }
+
+    public Diff(final String emptyValue, final List<String> a, final List<String> b)
+    {
+        this.emptyValue = emptyValue;
         this.a = copyOf(a);
         this.b = copyOf(b);
     }
+
 
     public Result result()
     {
@@ -27,7 +35,7 @@ class Diff
         if (a.isEmpty() || b.isEmpty())
         {
             final int expectedLength = Math.abs(a.size() - b.size());
-            return new Result(expectedLength, appended(a, "_", expectedLength), appended(b, "_", expectedLength));
+            return new Result(expectedLength, appended(a, emptyValue, expectedLength), appended(b, emptyValue, expectedLength));
         }
 
         final Result result1 = new Diff(a.subList(1, a.size()), b).result();
@@ -42,11 +50,11 @@ class Diff
         }
         if (result1.differences() < result2.differences())
         {
-            return new Result(result1.differences() + 1, prepended(a.get(0), result1.a), prepended("_", result1.b));
+            return new Result(result1.differences() + 1, prepended(a.get(0), result1.a), prepended(emptyValue, result1.b));
         }
         else
         {
-            return new Result(result2.differences() + 1, prepended("_", result2.a), prepended(b.get(0), result2.b));
+            return new Result(result2.differences() + 1, prepended(emptyValue, result2.a), prepended(b.get(0), result2.b));
         }
     }
 
