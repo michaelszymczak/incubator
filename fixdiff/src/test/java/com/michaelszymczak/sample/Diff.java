@@ -18,7 +18,7 @@ public final class Diff<Value>
 
     private Diff(final Value emptyValue, final List<Value> a, final List<Value> b)
     {
-        if (a.stream().anyMatch(value -> value.equals(emptyValue)) || b.stream().anyMatch(value -> value.equals(emptyValue)))
+        if (a.stream().anyMatch(value -> isEqual.test(value, emptyValue)) || b.stream().anyMatch(value -> isEqual.test(value, emptyValue)))
         {
             throw new IllegalArgumentException("Empty value " + emptyValue + " not allowed in the sequences");
         }
@@ -51,7 +51,7 @@ public final class Diff<Value>
 
         final Result<Value> result1 = diff(emptyValue, a.subList(1, a.size()), b).result();
         final Result<Value> result2 = diff(emptyValue, a, b.subList(1, b.size())).result();
-        if (a.get(0).equals(b.get(0)))
+        if (isEqual.test(a.get(0), b.get(0)))
         {
             final Result<Value> result3 = diff(emptyValue, a.subList(1, a.size()), b.subList(1, b.size())).result();
             if (result3.differences() < result1.differences() + 1 && result3.differences() < result2.differences())
