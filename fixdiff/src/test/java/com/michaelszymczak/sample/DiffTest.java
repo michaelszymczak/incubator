@@ -37,7 +37,7 @@ public class DiffTest
     }
 
     @Test
-    void shouldInsertItemMissingFromTheFirstSequence()
+    void shouldInsertItemMissingFromTheBeginningOfTheFirstSequence()
     {
         assertThat(new Diff(of("b", "c"), of("a", "b", "c")).result()).isEqualTo(
                 new Result(1, of("", "b", "c"), of("a", "b", "c"))
@@ -45,7 +45,7 @@ public class DiffTest
     }
 
     @Test
-    void shouldInsertItemMissingFromTheSecondSequence()
+    void shouldInsertItemMissingFromTheBeginningOfTheSecondSequence()
     {
         assertThat(new Diff(of("a", "b", "c"), of("b", "c")).result()).isEqualTo(
                 new Result(1, of("a", "b", "c"), of("", "b", "c"))
@@ -53,7 +53,7 @@ public class DiffTest
     }
 
     @Test
-    void shouldInsertMultipleItemsMissingFromTheFirstSequence()
+    void shouldInsertMultipleItemsMissingFromTheBeginningTheFirstSequence()
     {
         assertThat(new Diff(of("c"), of("a", "b", "c")).result()).isEqualTo(
                 new Result(2, of("", "", "c"), of("a", "b", "c"))
@@ -61,10 +61,46 @@ public class DiffTest
     }
 
     @Test
-    void shouldInsertMultipleItemsMissingFromTheSecondSequence()
+    void shouldInsertMultipleItemsMissingFromTheBeginningTheSecondSequence()
     {
         assertThat(new Diff(of("a", "b", "c"), of("c")).result()).isEqualTo(
                 new Result(2, of("a", "b", "c"), of("", "", "c"))
+        );
+    }
+
+    @Test
+    void shouldRearrangeTheItemsIntoMissingAndMatching()
+    {
+        assertThat(new Diff(of("a"), of("b")).result()).isEqualTo(
+                new Result(2, of("", "a"), of("b", ""))
+        );
+    }
+
+    @Test
+    void shouldInsertTheMiddleItemMissingFromTheFirstSequence()
+    {
+        assertThat(new Diff(of("a", "c"), of("a", "b", "c")).result()).isEqualTo(
+                new Result(1, of("a", "", "c"), of("a", "b", "c"))
+        );
+    }
+
+    @Test
+    void shouldInsertTheMiddleItemMissingFromTheSecondSequence()
+    {
+        assertThat(new Diff(of("a", "b", "c"), of("a", "c")).result()).isEqualTo(
+                new Result(1, of("a", "b", "c"), of("a", "", "c"))
+        );
+    }
+
+    @Test
+    void shouldRearrangeMultipleItemsIntoMissingAndMatching()
+    {
+        assertThat(new Diff(of("a", "b", "c", "d"), of("b", "c", "e")).result()).isEqualTo(
+                new Result(
+                        3,
+                        of("a", "b", "c", "", "d"),
+                        of("", "b", "c", "e", "")
+                )
         );
     }
 }

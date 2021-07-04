@@ -37,17 +37,33 @@ class Diff
 
         final Result result1 = new Diff(a.subList(1, a.size()), b).result();
         final Result result2 = new Diff(a, b.subList(1, b.size())).result();
+        if (a.get(0).equals(b.get(0)))
+        {
+            final Result result3 = new Diff(a.subList(1, a.size()), b.subList(1, b.size())).result();
+            if (result3.differences < result1.differences + 1 && result3.differences < result2.differences)
+            {
+                final List<String> newA = new ArrayList<>(a.subList(0, 1));
+                newA.addAll(result3.a);
+                final List<String> newB = new ArrayList<>(b.subList(0, 1));
+                newB.addAll(result3.b);
+                return new Result(result3.differences, newA, newB);
+            }
+        }
         if (result1.differences < result2.differences)
         {
+            final List<String> newA = new ArrayList<>(a.subList(0, 1));
+            newA.addAll(result1.a);
             final List<String> newB = new ArrayList<>(List.of(""));
             newB.addAll(result1.b);
-            return new Result(result1.differences + 1, a, newB);
+            return new Result(result1.differences + 1, newA, newB);
         }
         else
         {
             final List<String> newA = new ArrayList<>(List.of(""));
             newA.addAll(result2.a);
-            return new Result(result2.differences + 1, newA, b);
+            final List<String> newB = new ArrayList<>(b.subList(0, 1));
+            newB.addAll(result2.b);
+            return new Result(result2.differences + 1, newA, newB);
         }
     }
 }
