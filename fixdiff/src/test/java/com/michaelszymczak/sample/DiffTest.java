@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
+import static com.michaelszymczak.sample.Diff.diff;
 import static java.util.List.of;
 
 public class DiffTest
@@ -15,13 +16,13 @@ public class DiffTest
     @Test
     void emptySequencesShouldBeTheSame()
     {
-        assertThat(Diff.diff(of(), of()).result()).isEqualTo(new Result<>(0, List.of(), List.of()));
+        assertThat(diff(of(), of()).result()).isEqualTo(new Result<>(0, List.of(), List.of()));
     }
 
     @Test
     void shouldDetectTheSameSequences()
     {
-        assertThat(Diff.diff(of("foo", "bar", "c"), of("foo", "bar", "c")).result()).isEqualTo(
+        assertThat(diff(of("foo", "bar", "c"), of("foo", "bar", "c")).result()).isEqualTo(
                 new Result<>(0, of("foo", "bar", "c"), of("foo", "bar", "c"))
         );
     }
@@ -29,10 +30,10 @@ public class DiffTest
     @Test
     void shouldUseTheLengthAsTheDifferenceBetweenEmptyAndNonEmptySequence()
     {
-        assertThat(Diff.diff(of("foo", "bar", "c"), of()).result()).isEqualTo(
+        assertThat(diff(of("foo", "bar", "c"), of()).result()).isEqualTo(
                 new Result<>(3, of("foo", "bar", "c"), of("_", "_", "_"))
         );
-        assertThat(Diff.diff(of(), of("foo", "bar")).result()).isEqualTo(
+        assertThat(diff(of(), of("foo", "bar")).result()).isEqualTo(
                 new Result<>(2, of("_", "_"), of("foo", "bar"))
         );
     }
@@ -40,7 +41,7 @@ public class DiffTest
     @Test
     void shouldInsertItemMissingFromTheBeginningOfTheFirstSequence()
     {
-        assertThat(Diff.diff(of("b", "c"), of("a", "b", "c")).result()).isEqualTo(
+        assertThat(diff(of("b", "c"), of("a", "b", "c")).result()).isEqualTo(
                 new Result<>(1, of("_", "b", "c"), of("a", "b", "c"))
         );
     }
@@ -48,7 +49,7 @@ public class DiffTest
     @Test
     void shouldInsertItemMissingFromTheBeginningOfTheSecondSequence()
     {
-        assertThat(Diff.diff(of("a", "b", "c"), of("b", "c")).result()).isEqualTo(
+        assertThat(diff(of("a", "b", "c"), of("b", "c")).result()).isEqualTo(
                 new Result<>(1, of("a", "b", "c"), of("_", "b", "c"))
         );
     }
@@ -56,7 +57,7 @@ public class DiffTest
     @Test
     void shouldInsertMultipleItemsMissingFromTheBeginningTheFirstSequence()
     {
-        assertThat(Diff.diff(of("c"), of("a", "b", "c")).result()).isEqualTo(
+        assertThat(diff(of("c"), of("a", "b", "c")).result()).isEqualTo(
                 new Result<>(2, of("_", "_", "c"), of("a", "b", "c"))
         );
     }
@@ -64,7 +65,7 @@ public class DiffTest
     @Test
     void shouldInsertMultipleItemsMissingFromTheBeginningTheSecondSequence()
     {
-        assertThat(Diff.diff(of("a", "b", "c"), of("c")).result()).isEqualTo(
+        assertThat(diff(of("a", "b", "c"), of("c")).result()).isEqualTo(
                 new Result<>(2, of("a", "b", "c"), of("_", "_", "c"))
         );
     }
@@ -72,7 +73,7 @@ public class DiffTest
     @Test
     void shouldRearrangeTheItemsIntoMissingAndMatching()
     {
-        assertThat(Diff.diff(of("a"), of("b")).result()).isEqualTo(
+        assertThat(diff(of("a"), of("b")).result()).isEqualTo(
                 new Result<>(2, of("_", "a"), of("b", "_"))
         );
     }
@@ -80,7 +81,7 @@ public class DiffTest
     @Test
     void shouldInsertTheMiddleItemMissingFromTheFirstSequence()
     {
-        assertThat(Diff.diff(of("a", "c"), of("a", "b", "c")).result()).isEqualTo(
+        assertThat(diff(of("a", "c"), of("a", "b", "c")).result()).isEqualTo(
                 new Result<>(1, of("a", "_", "c"), of("a", "b", "c"))
         );
     }
@@ -88,7 +89,7 @@ public class DiffTest
     @Test
     void shouldInsertTheMiddleItemMissingFromTheSecondSequence()
     {
-        assertThat(Diff.diff(of("a", "b", "c"), of("a", "c")).result()).isEqualTo(
+        assertThat(diff(of("a", "b", "c"), of("a", "c")).result()).isEqualTo(
                 new Result<>(1, of("a", "b", "c"), of("a", "_", "c"))
         );
     }
@@ -96,7 +97,7 @@ public class DiffTest
     @Test
     void shouldRearrangeMultipleItemsIntoMissingAndMatching()
     {
-        assertThat(Diff.diff(of("a", "b", "c", "d"), of("b", "c", "e")).result()).isEqualTo(
+        assertThat(diff(of("a", "b", "c", "d"), of("b", "c", "e")).result()).isEqualTo(
                 new Result<>(
                         3,
                         of("a", "b", "c", "_", "d"),
@@ -108,7 +109,7 @@ public class DiffTest
     @Test
     void shouldNotMergeMultipleItemsEvenIfTheyLookTheSame()
     {
-        assertThat(Diff.diff(of("a", "b"), of("ab")).result()).isEqualTo(
+        assertThat(diff(of("a", "b"), of("ab")).result()).isEqualTo(
                 new Result<>(3, of("_", "a", "b"), of("ab", "_", "_"))
         );
     }
@@ -116,7 +117,7 @@ public class DiffTest
     @Test
     void shouldFindMinimumDiffForLongerSequence()
     {
-        assertThat(Diff.diff(
+        assertThat(diff(
                 of("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "o", "p"),
                 of("b", "d", "e", "f", "k", "l", "m", "n", "o", "p")
         ).result()).isEqualTo(
@@ -131,14 +132,14 @@ public class DiffTest
     @Test
     void shouldMakeEmptyValueCustomizable()
     {
-        assertThat(Diff.diff("[EMPTY]", List.of("a"), List.of()).result()).isEqualTo(
+        assertThat(diff("[EMPTY]", List.of("a"), List.of()).result()).isEqualTo(
                 new Result<>(1, List.of("a"), List.of("[EMPTY]")));
     }
 
     @Test
     void shouldAllowAnyValueType()
     {
-        assertThat(Diff.diff(0, of(1, 2, 3, 4), of(2, 3, 6)).result()).isEqualTo(
+        assertThat(diff(0, of(1, 2, 3, 4), of(2, 3, 6)).result()).isEqualTo(
                 new Result<>(
                         3,
                         of(1, 2, 3, 0, 4),
@@ -150,8 +151,8 @@ public class DiffTest
     @Test
     void shouldNotAllowEmptyValueInTheSequence()
     {
-        assertThatThrownBy(() -> Diff.diff("x", List.of("a", "x"), List.of())).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> Diff.diff("x", List.of("a"), List.of("a", "x", "b"))).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> Diff.diff(5, List.of(5), List.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> diff("x", List.of("a", "x"), List.of())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> diff("x", List.of("a"), List.of("a", "x", "b"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> diff(5, List.of(5), List.of())).isInstanceOf(IllegalArgumentException.class);
     }
 }
