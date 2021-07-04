@@ -103,4 +103,27 @@ public class DiffTest
                 )
         );
     }
+
+    @Test
+    void shouldNotMergeMultipleItesEvenIfTheyLookTheSame()
+    {
+        assertThat(new Diff(of("a", "b"), of("ab")).result()).isEqualTo(
+                new Result(3, of("", "a", "b"), of("ab", "", ""))
+        );
+    }
+
+    @Test
+    void shouldFindMinimumDiffForLongerSequence()
+    {
+        assertThat(new Diff(
+                of("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "o", "p"),
+                of("b", "d", "e", "f", "k", "l", "m", "n", "o", "p")
+        ).result()).isEqualTo(
+                new Result(
+                        8,
+                        of("a", "b", "c", "d", "e", "f", "", "g", "h", "i", "l", "", "", "o", "p"),
+                        of("", "b", "", "d", "e", "f", "k", "", "", "", "l", "m", "n", "o", "p")
+                )
+        );
+    }
 }
