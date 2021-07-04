@@ -2,25 +2,30 @@ package com.michaelszymczak.sample;
 
 import java.util.List;
 
-class Result
+class Result<Value>
 {
-    final List<String> a;
-    final List<String> b;
+    final List<Value> a;
+    final List<Value> b;
     private final int differences;
 
-    public Result(final int differences, final List<String> a, final List<String> b)
+    public Result(final int differences, final List<Value> a, final List<Value> b)
     {
         this.differences = differences;
         this.a = a;
         this.b = b;
     }
 
+    public int differences()
+    {
+        return differences;
+    }
+
     @Override
     public int hashCode()
     {
-        int result = differences();
-        result = 31 * result + (a != null ? a.hashCode() : 0);
+        int result = a != null ? a.hashCode() : 0;
         result = 31 * result + (b != null ? b.hashCode() : 0);
+        result = 31 * result + differences;
         return result;
     }
 
@@ -36,9 +41,9 @@ class Result
             return false;
         }
 
-        final Result result = (Result)o;
+        final Result<?> result = (Result<?>)o;
 
-        if (differences() != result.differences())
+        if (differences != result.differences)
         {
             return false;
         }
@@ -53,14 +58,9 @@ class Result
     public String toString()
     {
         return "Result{" +
-               "differences=" + differences() +
-               ", a=" + a +
+               "a=" + a +
                ", b=" + b +
+               ", differences=" + differences +
                '}';
-    }
-
-    public int differences()
-    {
-        return differences;
     }
 }
