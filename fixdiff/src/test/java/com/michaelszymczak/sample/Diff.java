@@ -29,8 +29,8 @@ class Diff
             final int expectedLength = Math.abs(a.size() - b.size());
             final List<String> aResult = new ArrayList<>(a);
             final List<String> bResult = new ArrayList<>(b);
-            range(aResult.size(), expectedLength).forEach(__ -> aResult.add(""));
-            range(bResult.size(), expectedLength).forEach(__ -> bResult.add(""));
+            range(aResult.size(), expectedLength).forEach(__ -> aResult.add("_"));
+            range(bResult.size(), expectedLength).forEach(__ -> bResult.add("_"));
 
             return new Result(expectedLength, aResult, bResult);
         }
@@ -53,13 +53,13 @@ class Diff
         {
             final List<String> newA = new ArrayList<>(a.subList(0, 1));
             newA.addAll(result1.a);
-            final List<String> newB = new ArrayList<>(List.of(""));
+            final List<String> newB = new ArrayList<>(List.of("_"));
             newB.addAll(result1.b);
             return new Result(result1.differences + 1, newA, newB);
         }
         else
         {
-            final List<String> newA = new ArrayList<>(List.of(""));
+            final List<String> newA = new ArrayList<>(List.of("_"));
             newA.addAll(result2.a);
             final List<String> newB = new ArrayList<>(b.subList(0, 1));
             newB.addAll(result2.b);
