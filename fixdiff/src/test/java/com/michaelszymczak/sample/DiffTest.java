@@ -155,4 +155,62 @@ public class DiffTest
         assertThatThrownBy(() -> diff("x", List.of("a"), List.of("a", "x", "b"))).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> diff(5, List.of(5), List.of())).isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void shouldAllowCustomEqualityLogic()
+    {
+        assertThat(diff("__", (v1, v2) -> v1.charAt(0) == v2.charAt(0),
+                        of("a1", "b1"), of("a2", "b2")
+        ).result()).isEqualTo(
+                new Result<>(
+                        0,
+                        of("a1", "b1"),
+                        of("a2", "b2")
+                )
+        );
+
+        assertThat(diff("__", (v1, v2) -> v1.charAt(0) == v2.charAt(0),
+                        of("b1", "c1"), of("a2", "b2", "c2")
+        ).result()).isEqualTo(
+                new Result<>(
+                        1,
+                        of("__", "b1", "c1"),
+                        of("a2", "b2", "c2")
+                )
+        );
+
+        assertThat(diff("__", (v1, v2) -> v1.charAt(0) == v2.charAt(0),
+                        of("a1", "b1", "c1", "d1"), of("a1", "c2", "e1")
+        ).result()).isEqualTo(
+                new Result<>(
+                        3,
+                        of("a1", "b1", "c1", "__", "d1"),
+                        of("a1", "__", "c2", "e1", "__")
+                )
+        );
+
+        assertThat(diff(
+                "_", (v1, v2) -> v1.toLowerCase().equals(v2.toLowerCase()),
+                of("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "o", "p"),
+                of("A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "O", "P")
+        ).result()).isEqualTo(
+                new Result<>(
+                        0,
+                        of("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "o", "p"),
+                        of("A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "O", "P")
+                )
+        );
+
+        assertThat(diff(
+                "_", (v1, v2) -> false,
+                of("a", "b", "c", "d", "e", "f"),
+                of("A", "B", "C", "D", "E", "F")
+        ).result()).isEqualTo(
+                new Result<>(
+                        12,
+                        of("_", "_", "_", "_", "_", "_", "a", "b", "c", "d", "e", "f"),
+                        of("A", "B", "C", "D", "E", "F", "_", "_", "_", "_", "_", "_")
+                )
+        );
+    }
 }
