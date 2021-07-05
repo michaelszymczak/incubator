@@ -18,6 +18,10 @@ class Result<Value>
 
     public Result(final int differences, final List<String> aLabels, final List<String> bLabels, final List<Value> aValues, final List<Value> bValues)
     {
+        if (aLabels.size() != bLabels.size() || aLabels.size() != aValues.size() || aLabels.size() != bValues.size())
+        {
+            throw new IllegalArgumentException("Wrong number of entries");
+        }
         this.differences = differences;
         this.aLabels = aLabels;
         this.bLabels = bLabels;
@@ -28,6 +32,11 @@ class Result<Value>
     public int differences()
     {
         return differences;
+    }
+
+    public int entriesCount()
+    {
+        return aLabels.size();
     }
 
     @Override
