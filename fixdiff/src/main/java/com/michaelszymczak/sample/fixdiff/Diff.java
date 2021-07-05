@@ -1,11 +1,11 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
 import java.util.function.Function;
 
 
-import static com.michaelszymczak.sample.Lists.appended;
-import static com.michaelszymczak.sample.Lists.prepended;
+import static com.michaelszymczak.sample.fixdiff.Lists.appended;
+import static com.michaelszymczak.sample.fixdiff.Lists.prepended;
 import static java.util.List.copyOf;
 import static java.util.stream.Collectors.toList;
 

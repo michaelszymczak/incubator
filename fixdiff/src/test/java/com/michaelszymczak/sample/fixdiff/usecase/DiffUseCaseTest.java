@@ -1,13 +1,16 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff.usecase;
 
 import java.util.List;
+
+import com.michaelszymczak.sample.fixdiff.Diff;
+import com.michaelszymczak.sample.fixdiff.Summary;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-import static com.michaelszymczak.sample.Diff.diff;
+import static com.michaelszymczak.sample.fixdiff.Diff.diff;
 
 public class DiffUseCaseTest
 {

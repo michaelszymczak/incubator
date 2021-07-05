@@ -1,9 +1,9 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Result<Value>
+public class Result<Value>
 {
     final List<String> aLabels;
     final List<String> bLabels;

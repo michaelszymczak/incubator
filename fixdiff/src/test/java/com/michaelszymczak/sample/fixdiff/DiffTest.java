@@ -1,4 +1,4 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-import static com.michaelszymczak.sample.Diff.diff;
+import static com.michaelszymczak.sample.fixdiff.Diff.diff;
 import static java.util.List.of;
 
 public class DiffTest

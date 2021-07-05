@@ -1,4 +1,4 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import static java.util.stream.IntStream.range;
 
-public class Lists
+class Lists
 {
     static <Value> List<Value> prepended(final Value value, final List<Value> original)
     {

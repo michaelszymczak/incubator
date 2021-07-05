@@ -1,4 +1,4 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
-package com.michaelszymczak.sample;
+package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class Summary
+public class Summary
 {
     private final int numberOfCompletelyDifferentItems;
     private final List<Entry> entries;
@@ -52,10 +52,10 @@ class Summary
         return labelsB;
     }
 
-    static class Entry
+    public static class Entry
     {
-        final String a;
-        final String b;
+        public final String a;
+        public final String b;
 
         public Entry(final String a, final String b)
         {
