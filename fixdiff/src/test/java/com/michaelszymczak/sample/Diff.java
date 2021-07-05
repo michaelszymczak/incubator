@@ -5,19 +5,19 @@ import java.util.function.Function;
 
 
 import static com.michaelszymczak.sample.Lists.appended;
-import static com.michaelszymczak.sample.Lists.map;
 import static com.michaelszymczak.sample.Lists.prepended;
 import static java.util.List.copyOf;
+import static java.util.stream.Collectors.toList;
 
 public final class Diff<Value>
 {
+    private final String emptyLabel;
     private final Value emptyValue;
-    private final List<Value> aValues;
-    private final List<Value> bValues;
+    private final Function<Value, String> toLabel;
     private final List<String> aLabels;
     private final List<String> bLabels;
-    private final Function<Value, String> toLabel;
-    private final String emptyLabel;
+    private final List<Value> aValues;
+    private final List<Value> bValues;
 
     private Diff(
             final String emptyLabel,
@@ -31,8 +31,8 @@ public final class Diff<Value>
         this.emptyValue = emptyValue;
         this.aValues = copyOf(aValues);
         this.bValues = copyOf(bValues);
-        this.aLabels = map(toLabel, aValues);
-        this.bLabels = map(toLabel, bValues);
+        this.aLabels = aValues.stream().map(toLabel).collect(toList());
+        this.bLabels = bValues.stream().map(toLabel).collect(toList());
         this.toLabel = toLabel;
         if (aLabels.stream().anyMatch(value -> value.equals(emptyLabel)) || bLabels.stream().anyMatch(value -> value.equals(emptyLabel)))
         {
@@ -74,42 +74,41 @@ public final class Diff<Value>
             );
         }
 
-        final Result<Value> result1 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues).result();
-        final Result<Value> result2 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues, bValues.subList(1, bValues.size())).result();
+        final Result<Value> bShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues).result();
+        final Result<Value> aShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues, bValues.subList(1, bValues.size())).result();
         if (aLabels.get(0).equals(bLabels.get(0)))
         {
-            final Result<Value> result3 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues.subList(1, bValues.size())).result();
-            if (result3.differences() < result1.differences() + 1 && result3.differences() < result2.differences())
+            final Result<Value> matchingFirstLetterResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues.subList(1, bValues.size())).result();
+            if (matchingFirstLetterResult.differences() < bShiftedRightResult.differences() + 1 && matchingFirstLetterResult.differences() < aShiftedRightResult.differences())
             {
                 return new Result<>(
-                        result3.differences(),
-                        prepended(aLabels.get(0), result3.aLabels),
-                        prepended(bLabels.get(0), result3.bLabels),
-                        prepended(aValues.get(0), result3.aValues),
-                        prepended(bValues.get(0), result3.bValues)
+                        matchingFirstLetterResult.differences(),
+                        prepended(aLabels.get(0), matchingFirstLetterResult.aLabels),
+                        prepended(bLabels.get(0), matchingFirstLetterResult.bLabels),
+                        prepended(aValues.get(0), matchingFirstLetterResult.aValues),
+                        prepended(bValues.get(0), matchingFirstLetterResult.bValues)
                 );
             }
         }
-        if (result1.differences() < result2.differences())
+        if (bShiftedRightResult.differences() < aShiftedRightResult.differences())
         {
             return new Result<>(
-                    result1.differences() + 1,
-                    prepended(aLabels.get(0), result1.aLabels),
-                    prepended(emptyLabel, result1.bLabels),
-                    prepended(aValues.get(0), result1.aValues),
-                    prepended(emptyValue, result1.bValues)
+                    bShiftedRightResult.differences() + 1,
+                    prepended(aLabels.get(0), bShiftedRightResult.aLabels),
+                    prepended(emptyLabel, bShiftedRightResult.bLabels),
+                    prepended(aValues.get(0), bShiftedRightResult.aValues),
+                    prepended(emptyValue, bShiftedRightResult.bValues)
             );
         }
         else
         {
             return new Result<>(
-                    result2.differences() + 1,
-                    prepended(emptyLabel, result2.aLabels),
-                    prepended(bLabels.get(0), result2.bLabels),
-                    prepended(emptyValue, result2.aValues),
-                    prepended(bValues.get(0), result2.bValues)
+                    aShiftedRightResult.differences() + 1,
+                    prepended(emptyLabel, aShiftedRightResult.aLabels),
+                    prepended(bLabels.get(0), aShiftedRightResult.bLabels),
+                    prepended(emptyValue, aShiftedRightResult.aValues),
+                    prepended(bValues.get(0), aShiftedRightResult.bValues)
             );
         }
     }
-
 }
