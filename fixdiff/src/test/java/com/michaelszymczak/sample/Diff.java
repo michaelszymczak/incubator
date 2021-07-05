@@ -1,78 +1,114 @@
 package com.michaelszymczak.sample;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 
 import static com.michaelszymczak.sample.Lists.appended;
-import static com.michaelszymczak.sample.Lists.equal;
+import static com.michaelszymczak.sample.Lists.map;
 import static com.michaelszymczak.sample.Lists.prepended;
 import static java.util.List.copyOf;
 
 public final class Diff<Value>
 {
     private final Value emptyValue;
-    private final List<Value> a;
-    private final List<Value> b;
-    private final BiPredicate<Value, Value> isEqual;
+    private final List<Value> aValues;
+    private final List<Value> bValues;
+    private final List<String> aLabels;
+    private final List<String> bLabels;
+    private final Function<Value, String> toLabel;
+    private final String emptyLabel;
 
-    private Diff(final Value emptyValue, final BiPredicate<Value, Value> isEqual, final List<Value> a, final List<Value> b)
+    private Diff(
+            final String emptyLabel,
+            final Value emptyValue,
+            final Function<Value, String> toLabel,
+            final List<Value> aValues,
+            final List<Value> bValues
+    )
     {
-        if (a.stream().anyMatch(value -> isEqual.test(value, emptyValue)) || b.stream().anyMatch(value -> isEqual.test(value, emptyValue)))
-        {
-            throw new IllegalArgumentException("Empty value " + emptyValue + " not allowed in the sequences");
-        }
+        this.emptyLabel = emptyLabel;
         this.emptyValue = emptyValue;
-        this.isEqual = isEqual;
-        this.a = copyOf(a);
-        this.b = copyOf(b);
+        this.aValues = copyOf(aValues);
+        this.bValues = copyOf(bValues);
+        this.aLabels = map(toLabel, aValues);
+        this.bLabels = map(toLabel, bValues);
+        this.toLabel = toLabel;
+        if (aLabels.stream().anyMatch(value -> value.equals(emptyLabel)) || bLabels.stream().anyMatch(value -> value.equals(emptyLabel)))
+        {
+            throw new IllegalArgumentException("Empty label " + emptyLabel + " not allowed in the sequences");
+        }
     }
 
-    public static Diff<String> diff(final List<String> a, final List<String> b)
+    public static Diff<String> diff(final String emptyValue, final List<String> a, final List<String> b)
     {
-        return diff("_", a, b);
+        return new Diff<>(emptyValue, emptyValue, Object::toString, a, b);
     }
 
-    public static <Value> Diff<Value> diff(final Value emptyValue, final List<Value> a, final List<Value> b)
+    public static <Value> Diff<Value> diff(
+            final String emptyLabel,
+            final Value emptyValue,
+            final Function<Value, String> toLabel,
+            final List<Value> a,
+            final List<Value> b
+    )
     {
-        return diff(emptyValue, Object::equals, a, b);
-    }
-
-    public static <Value> Diff<Value> diff(final Value emptyValue, final BiPredicate<Value, Value> isEqual, final List<Value> a, final List<Value> b)
-    {
-        return new Diff<>(emptyValue, isEqual, a, b);
+        return new Diff<>(emptyLabel, emptyValue, toLabel, a, b);
     }
 
     public Result<Value> result()
     {
-        if (equal(isEqual, a, b))
+        if (aLabels.equals(bLabels))
         {
-            return new Result<>(0, a, b);
+            return new Result<>(0, aLabels, bLabels, aValues, bValues);
         }
-        if (a.isEmpty() || b.isEmpty())
+        if (aLabels.isEmpty() || bLabels.isEmpty())
         {
-            final int expectedLength = Math.abs(a.size() - b.size());
-            return new Result<>(expectedLength, appended(a, emptyValue, expectedLength), appended(b, emptyValue, expectedLength));
+            final int expectedLength = Math.abs(aValues.size() - bValues.size());
+            return new Result<>(
+                    expectedLength,
+                    appended(aLabels, emptyLabel, expectedLength),
+                    appended(bLabels, emptyLabel, expectedLength),
+                    appended(aValues, emptyValue, expectedLength),
+                    appended(bValues, emptyValue, expectedLength)
+            );
         }
 
-        final Result<Value> result1 = new Diff<>(emptyValue, isEqual, a.subList(1, a.size()), b).result();
-        final Result<Value> result2 = new Diff<>(emptyValue, isEqual, a, b.subList(1, b.size())).result();
-        if (isEqual.test(a.get(0), b.get(0)))
+        final Result<Value> result1 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues).result();
+        final Result<Value> result2 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues, bValues.subList(1, bValues.size())).result();
+        if (aLabels.get(0).equals(bLabels.get(0)))
         {
-            final Result<Value> result3 = new Diff<>(emptyValue, isEqual, a.subList(1, a.size()), b.subList(1, b.size())).result();
+            final Result<Value> result3 = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues.subList(1, bValues.size())).result();
             if (result3.differences() < result1.differences() + 1 && result3.differences() < result2.differences())
             {
-                return new Result<>(result3.differences(), prepended(a.get(0), result3.a), prepended(b.get(0), result3.b));
+                return new Result<>(
+                        result3.differences(),
+                        prepended(aLabels.get(0), result3.aLabels),
+                        prepended(bLabels.get(0), result3.bLabels),
+                        prepended(aValues.get(0), result3.aValues),
+                        prepended(bValues.get(0), result3.bValues)
+                );
             }
         }
         if (result1.differences() < result2.differences())
         {
-            return new Result<>(result1.differences() + 1, prepended(a.get(0), result1.a), prepended(emptyValue, result1.b));
+            return new Result<>(
+                    result1.differences() + 1,
+                    prepended(aLabels.get(0), result1.aLabels),
+                    prepended(emptyLabel, result1.bLabels),
+                    prepended(aValues.get(0), result1.aValues),
+                    prepended(emptyValue, result1.bValues)
+            );
         }
         else
         {
-            return new Result<>(result2.differences() + 1, prepended(emptyValue, result2.a), prepended(b.get(0), result2.b));
+            return new Result<>(
+                    result2.differences() + 1,
+                    prepended(emptyLabel, result2.aLabels),
+                    prepended(bLabels.get(0), result2.bLabels),
+                    prepended(emptyValue, result2.aValues),
+                    prepended(bValues.get(0), result2.bValues)
+            );
         }
     }
 
