@@ -1,6 +1,8 @@
 package com.michaelszymczak.sample.fixdiff;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 import static com.michaelszymczak.sample.fixdiff.Diff.diff;
+import static java.lang.String.format;
 import static java.util.List.of;
 
 public class DiffTest
@@ -233,6 +236,23 @@ public class DiffTest
                         of("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "o", "p"),
                         of("A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "O", "P")
                 )
+        );
+    }
+
+    @Test
+    void shouldHandleLongerSequences()
+    {
+        final Result<String> result = diff(
+                "__",
+                IntStream.range(0, 100).filter(i -> i % 5 == 0).mapToObj(v -> format("%02d", v)).collect(Collectors.toList()),
+                IntStream.range(0, 100).filter(i -> i % 6 == 0).mapToObj(v -> format("%02d", v)).collect(Collectors.toList())
+        ).result();
+        assertThat(result.differences()).isEqualTo(29);
+        assertThat(result.aLabels.toString()).isEqualTo(
+                "[00, __, __, __, __, 05, 10, 15, 20, 25, 30, __, __, __, __, 35, 40, 45, 50, 55, 60, __, __, __, __, 65, 70, 75, 80, 85, 90, __, 95]"
+        );
+        assertThat(result.bLabels.toString()).isEqualTo(
+                "[00, 06, 12, 18, 24, __, __, __, __, __, 30, 36, 42, 48, 54, __, __, __, __, __, 60, 66, 72, 78, 84, __, __, __, __, __, 90, 96, __]"
         );
     }
 }

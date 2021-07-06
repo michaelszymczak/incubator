@@ -1,6 +1,9 @@
 package com.michaelszymczak.sample.fixdiff;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 
@@ -18,13 +21,17 @@ public final class Diff<Value>
     private final List<String> bLabels;
     private final List<Value> aValues;
     private final List<Value> bValues;
+    private final List<String> inputIdentifier;
+    private final Map<List<String>, Result<Value>> memoizedResults;
+
 
     private Diff(
             final String emptyLabel,
             final Value emptyValue,
             final Function<Value, String> toLabel,
             final List<Value> aValues,
-            final List<Value> bValues
+            final List<Value> bValues,
+            final Map<List<String>, Result<Value>> memoizedResults
     )
     {
         this.emptyLabel = emptyLabel;
@@ -34,6 +41,8 @@ public final class Diff<Value>
         this.aLabels = aValues.stream().map(toLabel).collect(toList());
         this.bLabels = bValues.stream().map(toLabel).collect(toList());
         this.toLabel = toLabel;
+        this.inputIdentifier = calculateInputIdentifier(aLabels, emptyLabel, bLabels);
+        this.memoizedResults = memoizedResults;
         if (aLabels.stream().anyMatch(value -> value.equals(emptyLabel)) || bLabels.stream().anyMatch(value -> value.equals(emptyLabel)))
         {
             throw new IllegalArgumentException("Empty label " + emptyLabel + " not allowed in the sequences");
@@ -42,7 +51,7 @@ public final class Diff<Value>
 
     public static Diff<String> diff(final String emptyValue, final List<String> a, final List<String> b)
     {
-        return new Diff<>(emptyValue, emptyValue, Object::toString, a, b);
+        return new Diff<>(emptyValue, emptyValue, Object::toString, a, b, new HashMap<>());
     }
 
     public static <Value> Diff<Value> diff(
@@ -53,10 +62,31 @@ public final class Diff<Value>
             final List<Value> b
     )
     {
-        return new Diff<>(emptyLabel, emptyValue, toLabel, a, b);
+        return new Diff<>(emptyLabel, emptyValue, toLabel, a, b, new HashMap<>());
+    }
+
+    private static List<String> calculateInputIdentifier(final List<String> aLabels, final String emptyLabel, final List<String> bLabels)
+    {
+        final List<String> labels = new ArrayList<>(aLabels);
+        labels.add(emptyLabel);
+        labels.addAll(bLabels);
+        return List.copyOf(labels);
     }
 
     public Result<Value> result()
+    {
+        final Result<Value> memoizedResult = memoizedResults.get(inputIdentifier);
+        if (memoizedResult != null)
+        {
+            return memoizedResult;
+        }
+
+        final Result<Value> result = calculateResult();
+        memoizedResults.put(inputIdentifier, result);
+        return result;
+    }
+
+    private Result<Value> calculateResult()
     {
         if (aLabels.equals(bLabels))
         {
@@ -74,11 +104,18 @@ public final class Diff<Value>
             );
         }
 
-        final Result<Value> bShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues).result();
-        final Result<Value> aShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues, bValues.subList(1, bValues.size())).result();
+        final Result<Value> bShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues, memoizedResults).result();
+        final Result<Value> aShiftedRightResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues, bValues.subList(1, bValues.size()), memoizedResults).result();
         if (aLabels.get(0).equals(bLabels.get(0)))
         {
-            final Result<Value> matchingFirstLetterResult = new Diff<>(emptyLabel, emptyValue, toLabel, aValues.subList(1, aValues.size()), bValues.subList(1, bValues.size())).result();
+            final Result<Value> matchingFirstLetterResult = new Diff<>(
+                    emptyLabel,
+                    emptyValue,
+                    toLabel,
+                    aValues.subList(1, aValues.size()),
+                    bValues.subList(1, bValues.size()),
+                    memoizedResults
+            ).result();
             if (matchingFirstLetterResult.differences() < bShiftedRightResult.differences() + 1 && matchingFirstLetterResult.differences() < aShiftedRightResult.differences())
             {
                 return new Result<>(
